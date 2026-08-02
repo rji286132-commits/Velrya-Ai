@@ -17,6 +17,7 @@
     "bcryptjs": "^2.4.3",
     "groq-sdk": "^0.3.0",
     "react-hot-toast": "^2.4.1",
+    "lucide-react": "^0.294.0",
     "zustand": "^4.4.0"
   },
   "devDependencies": {
