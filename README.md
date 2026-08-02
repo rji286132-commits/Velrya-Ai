@@ -15,4 +15,4 @@
 3. Create `.env.local` with your keys
 4. `npm run dev`
 
-## Environment Variables
+## Environment Variables.
