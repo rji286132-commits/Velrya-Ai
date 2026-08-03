@@ -14,8 +14,9 @@ export default function LoginPage(){
     e.preventDefault(); setLoading(true)
     try{
       const res=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})})
+      const data=await res.json()
       if(res.ok){ localStorage.setItem("velrya_user",JSON.stringify({email})); router.push("/chat") }
-      else { const d=await res.json(); alert(d.error || "Login fail") }
+      else { alert(data.error) }
     }catch{ alert("Error") }
     setLoading(false)
   }
@@ -26,24 +27,16 @@ export default function LoginPage(){
         <div style={{textAlign:'center', marginBottom:'32px'}}>
           <Link href="/" style={{fontSize:'28px', fontWeight:900, color:'white', textDecoration:'none'}}>VELRYA AI</Link>
           <h1 style={{fontSize:'36px', fontWeight:700, color:'white', margin:'24px 0 8px'}}>Welcome back</h1>
-          <p style={{color:'#888'}}>Login to Velrya AI</p>
         </div>
         <form onSubmit={handleLogin} style={{background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'24px', padding:'28px'}}>
-          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" style={{width:'100%', background:'#1a1a1f', border:'1px solid #2a2a30', borderRadius:'12px', padding:'14px', color:'white', marginBottom:'14px', outline:'none', boxSizing:'border-box'}} />
-          
-          {/* PASSWORD WITH EYE ICON */}
+          <input value={email} onChange={e=>setEmail(e.target.value)} style={{width:'100%', background:'#1a1a1f', border:'1px solid #2a2a30', borderRadius:'12px', padding:'14px', color:'white', marginBottom:'14px', boxSizing:'border-box'}} />
           <div style={{position:'relative', marginBottom:'20px'}}>
-            <input type={showPass ? "text" : "password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" style={{width:'100%', background:'#1a1a1f', border:'1px solid #2a2a30', borderRadius:'12px', padding:'14px 45px 14px 14px', color:'white', outline:'none', boxSizing:'border-box'}} />
-            <button type="button" onClick={()=>setShowPass(!showPass)} style={{position:'absolute', right:'14px', top:'50%', transform:'translateY(-50%)', background:'transparent', border:'none', cursor:'pointer', fontSize:'18px'}}>
-              {showPass ? "🙈" : "👁️"}
+            <input type={showPass ? "text" : "password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" style={{width:'100%', background:'#1a1a1f', border:'1px solid #2a2a30', borderRadius:'12px', padding:'14px 60px 14px 14px', color:'white', boxSizing:'border-box'}} />
+            <button type="button" onClick={()=>setShowPass(!showPass)} style={{position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', background:'#2a2a30', color:'white', border:'none', borderRadius:'8px', padding:'6px 10px', fontSize:'11px', cursor:'pointer', fontWeight:700}}>
+              {showPass ? "HIDE" : "SHOW"}
             </button>
           </div>
-
-          <button disabled={loading} style={{width:'100%', background:'white', color:'black', fontWeight:700, padding:'14px', borderRadius:'100px', border:'none', cursor:'pointer', fontSize:'16px'}}>{loading?"Logging...":"Continue"}</button>
-          <div style={{textAlign:'center', marginTop:'18px'}}>
-            <p style={{color:'#888', fontSize:'14px'}}>New here? <Link href="/register" style={{color:'white'}}>Create account</Link></p>
-            <Link href="/" style={{color:'#666', fontSize:'14px', textDecoration:'none', display:'inline-block', marginTop:'12px'}}>← Go to Home</Link>
-          </div>
+          <button disabled={loading} style={{width:'100%', background:'white', color:'black', fontWeight:700, padding:'14px', borderRadius:'100px', border:'none', cursor:'pointer'}}>{loading?"Logging...":"Continue"}</button>
         </form>
       </div>
     </div>
