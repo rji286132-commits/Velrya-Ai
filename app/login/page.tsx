@@ -10,35 +10,31 @@ export default function LoginPage(){
   const router=useRouter()
 
   const handleLogin=async(e:any)=>{
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault(); setLoading(true)
     try{
-      const res=await fetch("/api/auth/login",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email,password})
-      })
-      if(res.ok){
-        localStorage.setItem("velrya_user",JSON.stringify({email}))
-        router.push("/chat")
-      } else { alert("Login fail") }
+      const res=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})})
+      if(res.ok){ localStorage.setItem("velrya_user",JSON.stringify({email})); router.push("/chat") }
+      else { alert("Login fail - pehle Register karo") }
     }catch{ alert("Error") }
     setLoading(false)
   }
 
   return(
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white p-4">
-      <div className="w-full max-w-[420px]">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-black tracking-tighter">VELRYA AI</Link>
-          <h1 className="text-[32px] font-semibold mt-8">Welcome back</h1>
-          <p className="text-zinc-400">Login to Velrya AI</p>
+    <div style={{minHeight:'100vh', background:'#050507', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', fontFamily:'system-ui'}}>
+      <div style={{width:'100%', maxWidth:'420px'}}>
+        <div style={{textAlign:'center', marginBottom:'32px'}}>
+          <Link href="/" style={{fontSize:'28px', fontWeight:900, color:'white', letterSpacing:'-1px', textDecoration:'none'}}>VELRYA AI</Link>
+          <h1 style={{fontSize:'36px', fontWeight:700, color:'white', margin:'24px 0 8px'}}>Welcome back</h1>
+          <p style={{color:'#888'}}>Login to Velrya AI</p>
         </div>
-        <form onSubmit={handleLogin} className="bg-[#171717] border border-zinc-800 rounded-[20px] p-7 space-y-5">
-          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3.5 outline-none focus:border-white" />
-          <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3.5 outline-none focus:border-white" />
-          <button disabled={loading} className="w-full bg-white text-black font-bold py-3.5 rounded-full hover:bg-zinc-200">{loading?"Logging...":"Continue"}</button>
-          <div className="text-center"><Link href="/" className="text-sm text-zinc-500 hover:text-white">← Go to Home</Link></div>
+        <form onSubmit={handleLogin} style={{background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'24px', padding:'28px', backdropFilter:'blur(20px)'}}>
+          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" style={{width:'100%', background:'#1a1a1f', border:'1px solid #2a2a30', borderRadius:'12px', padding:'14px', color:'white', marginBottom:'14px', outline:'none', boxSizing:'border-box'}} />
+          <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" style={{width:'100%', background:'#1a1a1f', border:'1px solid #2a2a30', borderRadius:'12px', padding:'14px', color:'white', marginBottom:'20px', outline:'none', boxSizing:'border-box'}} />
+          <button disabled={loading} style={{width:'100%', background:'white', color:'black', fontWeight:700, padding:'14px', borderRadius:'100px', border:'none', cursor:'pointer', fontSize:'16px'}}>{loading?"Logging...":"Continue"}</button>
+          <div style={{textAlign:'center', marginTop:'18px'}}>
+            <p style={{color:'#888', fontSize:'14px'}}>New here? <Link href="/register" style={{color:'white'}}>Create account</Link></p>
+            <Link href="/" style={{color:'#666', fontSize:'14px', textDecoration:'none', display:'inline-block', marginTop:'12px'}}>← Go to Home</Link>
+          </div>
         </form>
       </div>
     </div>
