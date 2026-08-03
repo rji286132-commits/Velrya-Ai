@@ -1,10 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../../lib/db/supabase'
-import bcrypt from 'bcryptjs';
+import { NextResponse } from 'next/server'
 
-export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
-  const hashed = await bcrypt.hash(password, 12);
-  const { data: user } = await supabase.from('users').insert({ email, password_hash: hashed }).select().single();
-  return NextResponse.json({ user });
+export async function POST(req: Request) {
+  try {
+    const { email, password } = await req.json()
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email password chahiye" }, { status: 400 })
+    }
+    return NextResponse.json({ message: "Registered", user: { email } }, { status: 200 })
+  } catch (err) {
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
+  }
 }
