@@ -1,31 +1,118 @@
-import Link from 'next/link'
+'use client';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-export default function Home() {
+export default function Chat() {
+  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = localStorage.getItem('velrya_user') || localStorage.getItem('user');
+    if (!user) router.push('/login');
+  }, []);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+
+    const userMsg = input;
+    setMessages((prev) => [...prev, { role: 'user', content: userMsg }]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: userMsg }),
+      });
+      const data = await res.json();
+      setMessages((prev) => [
+        ...prev,
+        { role: 'ai', content: data.response || 'No response from AI' },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'ai', content: '❌ Error: Something went wrong' },
+      ]);
+    }
+    setLoading(false);
+  };
+
   return (
-    <div className="min-h-screen bg-[#050507] text-white">
+    <div className="min-h-screen bg-[#08080f] text-white flex flex-col">
       {/* Navbar */}
-      <nav className="flex justify-between items-center p-6 max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold tracking-wider">VELRYA AI</h1>
-        <Link href="/login" className="bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-zinc-200">Login</Link>
+      <nav className="flex justify-between items-center p-4 border-b border-gray-800">
+        <Link href="/" className="text-xl font-bold">🔥 VELRYA AI</Link>
+        <button
+          onClick={() => {
+            localStorage.removeItem('velrya_user');
+            localStorage.removeItem('user');
+            router.push('/login');
+          }}
+          className="text-sm text-gray-400 hover:text-white"
+        >
+          Logout
+        </button>
       </nav>
 
-      {/* Hero */}
-      <div className="flex flex-col items-center justify-center text-center mt-24 px-4">
-        <div className="border border-zinc-800 rounded-full px-4 py-1 text-sm text-zinc-400 mb-6">✨ The Future of Intelligence</div>
-        <h1 className="text-6xl md:text-8xl font-bold leading-tight">Think Faster.<br/><span className="text-zinc-500">Create Smarter.</span></h1>
-        <p className="text-zinc-400 mt-6 max-w-xl text-lg">Velrya AI is your personal superintelligence for writing, coding, and ideas. Chat, build, and deploy in seconds.</p>
-        <div className="flex gap-4 mt-10">
-          <Link href="/login" className="bg-white text-black px-8 py-4 rounded-full font-bold text-lg">Start Chatting - Free</Link>
-          <Link href="/login" className="border border-zinc-800 px-8 py-4 rounded-full font-bold text-lg hover:bg-zinc-900">View Demo</Link>
-        </div>
+      {/* Chat Messages */}
+      <div className="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full space-y-4">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
+            <div className="text-6xl mb-4">💬</div>
+            <h2 className="text-2xl font-bold text-white">Start chatting</h2>
+            <p className="text-sm">Ask anything to VELRYA AI</p>
+          </div>
+        ) : (
+          messages.map((msg, i) => (
+            <div
+              key={i}
+              className={`p-4 rounded-xl max-w-[80%] ${
+                msg.role === 'user'
+                  ? 'bg-white text-black ml-auto'
+                  : 'bg-[#1c1c2e] mr-auto'
+              }`}
+            >
+              {msg.content}
+            </div>
+          ))
+        )}
+        {loading && (
+          <div className="bg-[#1c1c2e] p-4 rounded-xl max-w-[80%] text-gray-400 animate-pulse">
+            AI is thinking...
+          </div>
+        )}
+        <div ref={endRef} />
       </div>
 
-      {/* Features */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-32 px-6 pb-20">
-        <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl"><h3 className="font-bold text-xl">⚡ Lightning Fast</h3><p className="text-zinc-400 mt-2">Powered by Next.js 14 & Vercel Edge</p></div>
-        <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl"><h3 className="font-bold text-xl">🔒 Secure Auth</h3><p className="text-zinc-400 mt-2">Supabase auth with full security</p></div>
-        <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl"><h3 className="font-bold text-xl">🚀 Deploy Ready</h3><p className="text-zinc-400 mt-2">Already live on Vercel Production</p></div>
+      {/* Input */}
+      <div className="border-t border-gray-800 p-4 bg-[#0f0f1a]">
+        <div className="max-w-3xl mx-auto flex gap-3">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Ask anything..."
+            className="flex-1 bg-[#1c1c2e] border border-gray-700 p-3 rounded-xl outline-none text-white"
+          />
+          <button
+            onClick={sendMessage}
+            disabled={loading}
+            className="bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-gray-200 disabled:opacity-50"
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
-  )
+  );
 }
