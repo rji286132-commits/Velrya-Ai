@@ -1,17 +1,10 @@
+// forgot-password
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import bcrypt from 'bcryptjs';
-
 export async function POST(req: Request) {
-  try {
-    const { email, newPassword } = await req.json();
-    const cleanEmail = email.toLowerCase().trim();
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-    const hashed = await bcrypt.hash(newPassword, 10);
-    const { error } = await supabase.from('users').update({ password_hash: hashed }).eq('email', cleanEmail);
-    if (error) throw error;
-    return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
-  }
+  const {email} = await req.json();
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const {error} = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password` });
+  if(error) return NextResponse.json({error: error.message}, {status: 400});
+  return NextResponse.json({message: 'Reset link bhej diya gaya hai email pe'});
 }
