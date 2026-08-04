@@ -22,7 +22,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           <User className="h-4 w-4 text-gray-400" />
           <span className="text-sm text-gray-300 max-w- truncate">{user?.email}</span>
         </div>
-        <button onClick={logout} className="text-gray-400 hover:text-white hover:bg-white/10 p-2 md:p-2.5 rounded-full transition">
+        <button onClick={() => logout()} className="text-gray-400 hover:text-white hover:bg-white/10 p-2 md:p-2.5 rounded-full transition">
           <LogOut className="h-5 w-5" />
         </button>
       </div>
