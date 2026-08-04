@@ -7,8 +7,8 @@ import Link from "next/link";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const supabase = createClient(
@@ -17,14 +17,11 @@ export default function LoginPage() {
   );
 
   const handleLogin = async () => {
-    if (!email ||!password) {
-      alert("Email and password required");
-      return;
-    }
+    if (!email ||!password) return alert("Email and password required");
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) alert("Login failed: " + error.message);
+    if (error) alert(error.message);
     else router.push("/chat");
   };
 
@@ -37,17 +34,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#08080f] flex items-center justify-center p-4">
-      <div className="w-full max-w-[400px] bg-[#12121f] rounded-2xl p-8 border border-gray-800">
-        <h1 className="text-3xl font-bold text-center text-white">VELRYA AI</h1>
-        <h2 className="text-center mt-2 mb-6 text-gray-400">Login</h2>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full p-3.5 mb-4 rounded-xl bg-[#1c1c2e] text-white outline-none border border-gray-700" />
+      <div className="w-full max-w-[380px] bg-[#12121f] rounded-2xl p-7 border border-gray-800">
+        <h1 className="text-[28px] font-bold text-center text-white">VELRYA AI</h1>
+        <h2 className="text-center mt-2 mb-6 text-gray-400 text-[15px]">Login</h2>
+        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" className="w-full p-3 mb-4 rounded-xl bg-[#1c1c2e] text-white border border-gray-700 text-[14px]" />
         <div className="relative mb-4">
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type={show? "text" : "password"} placeholder="Password" className="w-full p-3.5 pr-20 rounded-xl bg-[#1c1c2e] text-white outline-none border border-gray-700" />
-          <button onClick={() => setShow(!show)} className="absolute right-2 top-2 bottom-2 px-4 bg-[#2a2a40] rounded-lg text-sm font-bold text-white">{show? "HIDE" : "SHOW"}</button>
+          <input value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} placeholder="Password" className="w-full p-3 pr-20 rounded-xl bg-[#1c1c2e] text-white border border-gray-700 text-[14px]" />
+          <button onClick={()=>setShow(!show)} className="absolute right-2 top-2 bottom-2 px-4 bg-[#2a2a40] rounded-lg text-[12px] font-bold text-white">{show?"HIDE":"SHOW"}</button>
         </div>
-        <button onClick={handleLogin} disabled={loading} className="w-full p-3.5 rounded-full bg-white text-black font-bold mb-3">{loading? "Logging in..." : "Login"}</button>
-        <button onClick={handleGoogle} className="w-full p-3.5 rounded-full bg-[#1e1e32] text-white mb-3">Continue with Google</button>
-        <div className="text-center text-gray-400 text-sm">No account? <Link href="/register" className="text-white hover:underline">Register</Link></div>
+        <button onClick={handleLogin} className="w-full p-3 rounded-full bg-white text-black font-bold mb-3 text-[14px]">{loading?"Logging in...":"Login"}</button>
+        <button onClick={handleGoogle} className="w-full p-3 rounded-full bg-[#1e1e32] text-white mb-3 text-[14px]">Continue with Google</button>
+        <div className="text-center text-gray-400 text-[13px]">No account? <Link href="/register" className="text-white hover:underline">Register</Link></div>
       </div>
     </div>
   );
