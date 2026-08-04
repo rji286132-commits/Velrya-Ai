@@ -5,57 +5,41 @@ export async function POST(req: Request) {
   try {
     const { email } = await req.json();
 
-    if (!email) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
-        { error: 'Email is required' },
+        { error: 'Valid email is required' },
         { status: 400 }
       );
     }
 
     const cleanEmail = email.toLowerCase().trim();
+    const { origin } = new URL(req.url);
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Check if user exists
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('email')
-      .eq('email', cleanEmail)
-      .single();
-
-    if (userError || !user) {
-      // For security, don't reveal if user exists or not
-      return NextResponse.json({
-        message: 'If your email is registered, you will receive a reset link'
-      });
-    }
-
-    // Send password reset email via Supabase Auth
+    // Direct reset - bina users table check ke, privacy safe
     const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || origin}/reset-password`,
     });
 
     if (error) {
-      console.error('Reset password error:', error);
-      return NextResponse.json(
-        { error: 'Failed to send reset email' },
-        { status: 500 }
-      );
+      console.error('Reset error:', error);
+      // Error hone pe bhi same message - taki email leak na ho
     }
 
+    // Hamesha same message - privacy ke liye
     return NextResponse.json({
       success: true,
-      message: 'Password reset link sent to your email'
+      message: 'If your email is registered, you will receive a reset link'
     });
 
   } catch (error) {
     console.error('Forgot password error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { success: true, message: 'If your email is registered, you will receive a reset link' }
     );
   }
 }
