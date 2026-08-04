@@ -1,18 +1,19 @@
-# 🔥 Virya AI - AI Website Builder
+# VELRYA AI - AI Website Builder 🚀
 
-## Features
+> Premium Dark 3D AI Website Builder - Build stunning websites with AI in seconds.
+
+## ✨ Features
 - 🤖 AI-powered website generation
-- 💬 Chat interface
-- 📁 File upload support
-- 🖥 Live preview
-- 📋 Code export
-- 🔐 User authentication
-- 👑 Super Admin dashboard
+- 💬 Advanced Chat Interface
+- 📁 Smart File Upload Support
+- 🖥 Live 3D Preview
+- 📋 One-Click Code Export
+- 🔐 Secure User Authentication
+- 🎨 Dark Premium 3D Design
+- ⚡ Lightning Fast
 
-## Setup
+## 🚀 Setup - VELRYA AI
+
 1. Clone this repo
 2. `npm install`
-3. Create `.env.local` with your keys
-4. `npm run dev`
-
-## Environment Variables.
+3. Create `.env.local` with your keys:
