@@ -24,4 +24,4 @@ export function generateId(): string {
   return `velrya_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
-export const MAX_FILE_SIZE = 10 * 1024; // 10MB for VELRYA AI
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
