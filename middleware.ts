@@ -1,8 +1,48 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(req: NextRequest) {
-  return NextResponse.next(); // abhi ke liye sab allow
+  let response = NextResponse.next({
+    request: { headers: req.headers },
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return req.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: any) {
+          response.cookies.set({ name, value, ...options });
+        },
+        remove(name: string, options: any) {
+          response.cookies.set({ name, value: '', ...options });
+        },
+      },
+    }
+  );
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const { pathname } = req.nextUrl;
+
+  const publicRoutes = ['/login', '/register', '/api/auth', '/api/health'];
+  const isPublic = pathname === '/' || publicRoutes.some((r) => pathname.startsWith(r));
+
+  if (!user && !isPublic) {
+    if (pathname.startsWith('/api')) {
+      return NextResponse.json({ error: 'Unauthorized - VELRYA AI' }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  if (user && (pathname === '/login' || pathname === '/register')) {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+
+  return response;
 }
 
 export const config = {
