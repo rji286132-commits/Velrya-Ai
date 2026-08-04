@@ -19,35 +19,62 @@ export function Sidebar({ onSelectChat, onNewChat }: SidebarProps) {
   const filtered = history.filter(h => h.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="h-full bg-gray-900 flex flex-col">
-      <div className="p-4 border-b border-gray-800">
-        <button onClick={onNewChat} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded flex items-center justify-center gap-2">
+    <div className="h-full min-h- w-full md:w- bg-[#08080f]/90 backdrop-blur-xl border-r border-white/10 flex flex-col">
+      <div className="p-4 border-b border-white/10">
+        <div className="flex items-center justify-between mb-4 md:hidden">
+          <span className="font-black text-white">VELRYA AI</span>
+        </div>
+        <button
+          onClick={onNewChat}
+          className="w-full bg-white hover:bg-gray-200 text-black font-bold py-3 rounded-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(255,255,255,0.15)] active:scale-[0.98] transition-all text-sm"
+        >
           <Plus className="h-4 w-4" /> New Chat
         </button>
       </div>
       <div className="p-3">
         <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-          <input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 pl-9 pr-3 text-white" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+          <input
+            placeholder="Search chats..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#12121f] border border-white/10 rounded-full py-2.5 pl-9 pr-3 text-white text-sm outline-none focus:border-white/20 transition"
+          />
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto">
-        {filtered.map((item) => (
-          <div key={item.id} onClick={() => onSelectChat(item.id)} className="mx-2 mb-1 p-2 rounded hover:bg-gray-800 cursor-pointer flex items-center justify-between">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-3 w-3 text-gray-400" />
-                <span className="text-sm text-white truncate">{item.title}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
-                <Clock className="h-3 w-3" /> {new Date(item.updatedAt).toLocaleDateString()}
-              </div>
+      <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 scrollbar-thin">
+        {filtered.length === 0? (
+          <p className="text-xs text-gray-500 text-center mt-10 px-4">No chats found in Velrya AI</p>
+        ) : (
+          filtered.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => onSelectChat(item.id)}
+              className="group p-3 rounded-xl hover:bg-white/5 cursor-pointer flex items-center justify-between border border-transparent hover:border-white/10 transition-all"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                  <span className="text- text-white truncate font-medium">{item.title}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text- text-gray-500 mt-1 pl-5">
+                  <Clock className="h-3 w-3" /> {new Date(item.updatedAt).toLocaleDateString()}
+                </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteChat(item.id);
+                }}
+                className="opacity-0 group-hover:opacity-100 p-2 rounded-full hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
             </div>
-            <button onClick={(e) => { e.stopPropagation(); deleteChat(item.id); }} className="p-1 rounded hover:bg-gray-700 text-gray-400 hover:text-red-400">
-              <Trash2 className="h-3 w-3" />
-            </button>
-          </div>
-        ))}
+          ))
+        )}
+      </div>
+      <div className="p-3 border-t border-white/10">
+        <p className="text- text-gray-500 text-center">© VELRYA AI</p>
       </div>
     </div>
   );
