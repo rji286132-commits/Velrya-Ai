@@ -24,17 +24,16 @@ export default function Page() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Sirf count le rahe hain, email leak nahi hoga
     supabase
-     .from('users')
-     .select('id', { count: 'exact', head: true })
-     .then(({ count }) => {
-        if (count) {
+    .from('users')
+    .select('id', { count: 'exact', head: true })
+    .then(({ count }) => {
+        if (count!== null && count!== undefined) {
           setStats({ totalUsers: count });
         }
         setLoading(false);
       });
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem('velrya_user');
@@ -44,14 +43,14 @@ export default function Page() {
 
   if (loading) {
     return (
-      <div className="min-h- w-screen bg-[#08080f] flex items-center justify-center">
+      <div className="min-h-screen w-screen bg-[#08080f] flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h- w-screen bg-[#08080f] text-white">
+    <div className="min-h-screen w-screen bg-[#08080f] text-white">
       <nav className="flex justify-between items-center p-6 border-b border-gray-800">
         <Link href="/" className="text-2xl font-bold">Velrya AI</Link>
         <div className="flex items-center gap-4">
