@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,34 +16,24 @@ export default function RegisterPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const handleRegister = async () => {
-    if (!email || !password) {
+  const handleLogin = async () => {
+    if (!email ||!password) {
       alert("Email and password required");
       return;
     }
-    if (password.length < 8) {
-      alert("Password must be at least 8 characters");
-      return;
-    }
-
     setLoading(true);
-    try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert("✅ Account created! Role: " + data.user.role);
-        router.push("/login");
-      } else {
-        alert(data.error || "Registration failed");
-      }
-    } catch {
-      alert("Server error");
-    }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     setLoading(false);
+
+    if (error) {
+      alert("Login failed: " + error.message);
+    } else {
+      alert("✅ Login success!");
+      router.push("/"); // ya /dashboard jahan bhejna hai
+    }
   };
 
   const handleGoogle = async () => {
@@ -59,7 +49,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-[#08080f] flex items-center justify-center p-4">
       <div className="w-full max-w-[400px] bg-[#12121f] rounded-2xl p-8 border border-gray-800">
         <h1 className="text-3xl font-bold text-center text-white">VELRYA AI</h1>
-        <h2 className="text-center mt-2 mb-6 text-gray-400">Create Account</h2>
+        <h2 className="text-center mt-2 mb-6 text-gray-400">Login</h2>
 
         <input
           value={email}
@@ -72,24 +62,24 @@ export default function RegisterPage() {
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            type={show ? "text" : "password"}
-            placeholder="Password (min 8 chars)"
+            type={show? "text" : "password"}
+            placeholder="Password"
             className="w-full p-3.5 pr-20 rounded-xl bg-[#1c1c2e] text-white outline-none border border-gray-700 focus:border-white"
           />
           <button
             onClick={() => setShow(!show)}
-            className="absolute right-2 top-2 bottom-2 px-4 bg-[#2a2a40] rounded-lg text-sm font-bold text-white hover:bg-[#3a3a50]"
+            className="absolute right-2 top-2 bottom-2 px-4 bg-[#2a2a40] rounded-lg text-sm font-bold text-white"
           >
-            {show ? "HIDE" : "SHOW"}
+            {show? "HIDE" : "SHOW"}
           </button>
         </div>
 
         <button
-          onClick={handleRegister}
+          onClick={handleLogin}
           disabled={loading}
           className="w-full p-3.5 rounded-full bg-white text-black font-bold mb-3 hover:bg-gray-200 disabled:opacity-50"
         >
-          {loading ? "Creating..." : "Sign Up"}
+          {loading? "Logging in..." : "Login"}
         </button>
 
         <button
@@ -100,12 +90,5 @@ export default function RegisterPage() {
         </button>
 
         <div className="text-center text-gray-400 text-sm">
-          Already have an account?{" "}
-          <Link href="/login" className="text-white hover:underline">
-            Login
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
+          No account?{" "}
+          <Link href="/register" className="text-white hover:underline">
