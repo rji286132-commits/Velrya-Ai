@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export async function POST(request: Request) {
   try {
@@ -12,16 +16,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // Yaha tumhara Supabase logic ayega baad me
-    // Abhi build pass karne ke liye success return kar rahe hai
-    
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name },
+      },
+    });
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     return NextResponse.json(
-      { message: "User registered successfully", user: { email, name } },
+      { message: "User registered successfully", user: data.user },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.message || "Internal server error" },
       { status: 500 }
     );
   }
