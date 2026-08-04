@@ -1,44 +1,83 @@
 'use client';
-import { Message } from '@/types/chat';
-import { Copy, Check, User, Bot } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useChat } from '@/hooks/useChat';
+import { ChatMessage } from './ChatMessage';
+import { ChatInput } from './ChatInput';
 
-export function ChatMessage({ message }: { message: Message }) {
-  const [copied, setCopied] = useState(false);
-  const isUser = message.role === 'user';
+interface ChatInterfaceProps {
+  chatId: string | null;
+  onChatCreated: (id: string) => void;
+}
 
-  const copy = async () => {
-    await navigator.clipboard.writeText(message.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+export function ChatInterface({ chatId, onChatCreated }: ChatInterfaceProps) {
+  const chatData: any = useChat();
+  const messages = chatData?.messages || [];
+  const isLoading = chatData?.isLoading || false;
+  const sendMessage = chatData?.sendMessage;
+  const loadChat = chatData?.loadChat || (() => {});
+  const clearMessages = chatData?.clearMessages || (() => {});
+
+  const [typing, setTyping] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatId) loadChat(chatId);
+    else clearMessages();
+  }, [chatId]);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async (content: string, file?: File) => {
+    setTyping(true);
+    const newId = await sendMessage(content, file);
+    if (newId &&!chatId) onChatCreated(newId);
+    setTyping(false);
   };
 
-  const hasCode = message.content.includes('```') || message.content.includes('<html');
-
   return (
-    <div className={`flex gap-2 md:gap-3 w-full ${isUser? 'flex-row-reverse' : ''}`}>
-      <div className={`h-8 w-8 md:h-9 md:w-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.3)] ${isUser? 'bg-white text-black' : 'bg-gradient-to-br from-purple-500 to-blue-600 text-white'}`}>
-        {isUser? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+    <div className="flex-1 flex flex-col min-h-0 w-full bg-[#08080f] relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="border-b border-white/10 p-4 bg-[#0f0f18]/80 backdrop-blur-xl sticky top-0 z-10">
+        <h2 className="text-white font-semibold max-w-6xl mx-auto">{chatId? 'Chat with Velrya AI' : 'New Chat - Velrya AI'}</h2>
       </div>
-      <div className={`flex flex-col max-w-[85%] md:max-w-[75%] ${isUser? 'items-end' : 'items-start'}`}>
-        <div
-          className={`px-4 py-3 rounded- text- md:text- leading-6 shadow-[0_4px_20px_rgba(0,0,0,0.2)] backdrop-blur
-          ${isUser? 'bg-white text-black rounded-br-' : 'bg-[#12121f]/80 border border-white/10 text-gray-100 rounded-bl-'}
-        `}
-        >
-          <div className="whitespace-pre-wrap break-words">{message.content}</div>
-        </div>
-        <div className="flex items-center gap-2 mt-1.5 px-1">
-          <span className="text- text-gray-500">{new Date(message.timestamp).toLocaleTimeString()}</span>
-          {!isUser && hasCode && (
-            <button onClick={copy} className="text- text-gray-400 hover:text-white flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-1 rounded-full transition">
-              {copied? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />} {copied? 'Copied' : 'Copy'}
-            </button>
-          )}
-          {!isUser && message.provider && (
-            <span className="text- text-gray-500 bg-white/5 px-2 py-1 rounded-full">⚡ {message.provider} • Velrya AI</span>
-          )}
-        </div>
+
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 w-full max-w-6xl mx-auto">
+        {messages.length === 0? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white to-gray-400 flex items-center justify-center text-3xl mb-6 shadow-[0_10px_30px_rgba(255,255,255,0.2)]">
+              🚀
+            </div>
+            <h3 className="text-2xl md:text-4xl font-black text-white tracking-tight">Welcome to Velrya AI</h3>
+            <p className="text-gray-400 mt-2 text-sm md:text-base max-w-md">Describe your website, I&apos;ll build it in seconds with 3D premium design.</p>
+            <div className="flex flex-wrap gap-2 mt-6 justify-center max-w-lg">
+              {['Build a portfolio', 'Create ecommerce', 'Design landing page', 'Make blog'].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => handleSend(s)}
+                  className="px-4 py-2.5 bg-[#12121f]/80 backdrop-blur border border-white/10 hover:bg-white/10 rounded-full text-sm text-gray-300 hover:text-white transition-all"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          messages.map((msg: any, i: number) => <ChatMessage key={i} message={msg} />)
+        )}
+        {typing && (
+          <div className="flex gap-2 items-center text-gray-400 text-sm animate-pulse px-2">
+            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" />
+            Velrya AI is thinking...
+          </div>
+        )}
+        <div ref={endRef} />
+      </div>
+
+      <div className="border-t border-white/10 p-3 md:p-4 bg-[#0f0f18]/80 backdrop-blur-xl sticky bottom-0">
+        <ChatInput onSend={handleSend} isLoading={isLoading} />
       </div>
     </div>
   );
