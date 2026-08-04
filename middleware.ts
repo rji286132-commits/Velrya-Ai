@@ -1,31 +1,55 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  let response = NextResponse.next({
+    request: { headers: req.headers },
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return req.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: any) {
+          response.cookies.set({ name, value, ...options });
+        },
+        remove(name: string, options: any) {
+          response.cookies.set({ name, value: '', ...options });
+        },
+      },
+    }
+  );
+
+  const { data: { user } } = await supabase.auth.getUser();
   const { pathname } = req.nextUrl;
 
-  // Public routes for VELRYA AI
-  const publicRoutes = ['/login', '/signup', '/api/auth', '/api/health'];
+  const publicRoutes = ['/login', '/register', '/api/auth', '/api/health'];
   const isPublic = publicRoutes.some((r) => pathname.startsWith(r));
 
-  if (!token && !isPublic) {
+  if (!user && !isPublic) {
     if (pathname.startsWith('/api')) {
-      return NextResponse.json({ error: 'Unauthorized - VELRYA AI', app: 'VELRYA AI' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized - VELRYA AI' }, { status: 401 });
     }
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  // No super_admin check needed - all users are 'user' only
-  // Block old admin routes if any
+  // Agar login hai aur /login ya /register pe ja raha hai to / pe bhejo
+  if (user && (pathname === '/login' || pathname === '/register')) {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+
   if (pathname.startsWith('/admin') || pathname.startsWith('/super-admin')) {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
-export const config = { 
-  matcher: ['/((?!_next/static|_next/image|favicon.svg|icon.png).*)'] 
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.svg|icon.png).*)']
 };
