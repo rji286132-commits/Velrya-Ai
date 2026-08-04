@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from 'react';
 
 export function useDebounce<T>(value: T, delay: number = 500): T {
@@ -9,4 +10,9 @@ export function useDebounce<T>(value: T, delay: number = 500): T {
   }, [value, delay]);
 
   return debounced;
+}
+
+// For VELRYA AI Search
+export function useDebouncedSearch(value: string, delay = 300) {
+  return useDebounce(value, delay);
 }
