@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://velrya-ai.vercel.app"),
   title: "VELRYA AI - Intelligent Chat Assistant",
   description: "Build and chat with VELRYA AI - Your intelligent assistant for coding, writing, and ideas.",
   keywords: "AI chat, assistant, coding, writing, velrya",
@@ -13,9 +14,10 @@ export const metadata: Metadata = {
     siteName: "VELRYA AI",
     images: [
       {
-        url: "https://velrya-ai.vercel.app/og-image.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
+        alt: "VELRYA AI",
       },
     ],
     locale: "en_US",
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "VELRYA AI - Intelligent Chat Assistant",
     description: "Build and chat with VELRYA AI - Your intelligent assistant.",
-    images: ["https://velrya-ai.vercel.app/og-image.png"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -44,14 +46,23 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#08080f",
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="h-full">
+      <body className="min-h- w-screen bg-[#08080f] antialiased overflow-x-hidden">
+        {children}
+      </body>
     </html>
   );
 }
