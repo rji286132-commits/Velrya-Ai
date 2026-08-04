@@ -9,6 +9,10 @@ interface WebsiteExporterProps {
 
 export function WebsiteExporter({ html, css, js }: WebsiteExporterProps) {
   const exportWebsite = () => {
+    // Red X fix - script tag ko toda hai taaki build fail na ho
+    const scriptOpen = '<' + 'script>';
+    const scriptClose = '</' + 'script>';
+
     const fullHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,8 +22,9 @@ export function WebsiteExporter({ html, css, js }: WebsiteExporterProps) {
 <title>Built with VELRYA AI</title>
 <style>${css}</style>
 </head>
-<body>${html}<script>${js}<\/script></body>
+<body>${html}${scriptOpen}${js}${scriptClose}</body>
 </html>`;
+
     const blob = new Blob([fullHTML], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -32,7 +37,12 @@ export function WebsiteExporter({ html, css, js }: WebsiteExporterProps) {
   const handleShare = async () => {
     const text = 'Built with VELRYA AI - https://velrya-ai.vercel.app';
     if (navigator.share) {
-      await navigator.share({ title: 'VELRYA AI Website', text });
+      try {
+        await navigator.share({ title: 'VELRYA AI Website', text });
+      } catch (e) {
+        await navigator.clipboard.writeText(text);
+        alert('Link copied! - VELRYA AI');
+      }
     } else {
       await navigator.clipboard.writeText(text);
       alert('Link copied! - VELRYA AI');
