@@ -10,7 +10,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const { user, logout } = useAuth();
 
   return (
-    <header className="h-16 md:h- w-full bg-[#0f0f18]/80 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 z-20 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+    <header className="h-16 md:h-20 w-full bg-[#0f0f18]/80 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 z-20 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
       <div className="flex items-center gap-3">
         <button onClick={onToggleSidebar} className="text-white hover:bg-white/10 p-2 md:p-2.5 rounded-full transition">
           <Menu className="h-5 w-5" />
