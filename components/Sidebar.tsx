@@ -19,7 +19,7 @@ export function Sidebar({ onSelectChat, onNewChat }: SidebarProps) {
   const filtered = history.filter(h => h.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="h-full min-h- w-full md:w- bg-[#08080f]/90 backdrop-blur-xl border-r border-white/10 flex flex-col">
+    <div className="h-full min-h-screen w-full md:w-80 bg-[#08080f]/90 backdrop-blur-xl border-r border-white/10 flex flex-col">
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-4 md:hidden">
           <span className="font-black text-white">VELRYA AI</span>
@@ -42,8 +42,8 @@ export function Sidebar({ onSelectChat, onNewChat }: SidebarProps) {
           />
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 scrollbar-thin">
-        {filtered.length === 0? (
+      <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1">
+        {filtered.length === 0 ? (
           <p className="text-xs text-gray-500 text-center mt-10 px-4">No chats found in Velrya AI</p>
         ) : (
           filtered.map((item) => (
@@ -55,11 +55,12 @@ export function Sidebar({ onSelectChat, onNewChat }: SidebarProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                  <span className="text- text-white truncate font-medium">{item.title}</span>
+                  <span className="text-sm text-white truncate font-medium">{item.title}</span>
                 </div>
-                <div className="flex items-center gap-1.5 text- text-gray-500 mt-1 pl-5">
+                <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1 pl-5">
                   <Clock className="h-3 w-3" /> {new Date(item.updatedAt).toLocaleDateString()}
                 </div>
+              </div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -74,7 +75,7 @@ export function Sidebar({ onSelectChat, onNewChat }: SidebarProps) {
         )}
       </div>
       <div className="p-3 border-t border-white/10">
-        <p className="text- text-gray-500 text-center">© VELRYA AI</p>
+        <p className="text-xs text-gray-500 text-center">© VELRYA AI</p>
       </div>
     </div>
   );
