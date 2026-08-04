@@ -18,7 +18,13 @@ export const useChat = create<ChatStore>((set, get) => ({
   isLoading: false,
 
   sendMessage: async (content: string, file?: File) => {
-    set({ isLoading: true });
+    const userMsg: Message = {
+      role: 'user',
+      content,
+      timestamp: new Date().toISOString(),
+    };
+    set({ isLoading: true, messages: [...get().messages, userMsg] });
+
     try {
       const formData = new FormData();
       formData.append('content', content);
@@ -26,31 +32,65 @@ export const useChat = create<ChatStore>((set, get) => ({
 
       const res = await fetch('/api/chat', { method: 'POST', body: formData });
       const data = await res.json();
-      
-      set(state => ({
-        messages: [...state.messages, 
-          { role: 'user', content, timestamp: new Date().toISOString() },
-          { role: 'assistant', content: data.response, timestamp: new Date().toISOString(), provider: data.provider }
-        ],
-        isLoading: false
+
+      if (!res.ok) throw new Error(data?.error || 'VELRYA AI error');
+
+      const assistantMsg: Message = {
+        role: 'assistant',
+        content: data.response,
+        timestamp: new Date().toISOString(),
+        provider: data.provider || 'VELRYA AI',
+      };
+
+      set((state) => ({
+        messages: [...state.messages, assistantMsg],
+        isLoading: false,
       }));
+
+      // Refresh history after new chat
+      get().loadHistory();
+
       return data.chatId || null;
-    } catch { set({ isLoading: false }); return null; }
+    } catch (err) {
+      set({ isLoading: false });
+      console.error('VELRYA AI Chat Error:', err);
+      return null;
+    }
   },
 
   loadChat: async (id: string) => {
-    const res = await fetch(`/api/chat/${id}`);
-    if (res.ok) { const data = await res.json(); set({ messages: data.messages }); }
+    try {
+      const res = await fetch(`/api/chat/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        set({ messages: data.messages || [] });
+      }
+    } catch (e) {
+      console.error('VELRYA AI loadChat error', e);
+    }
   },
 
   loadHistory: async () => {
-    const res = await fetch('/api/chat/history');
-    if (res.ok) { const data = await res.json(); set({ history: data.history }); }
+    try {
+      const res = await fetch('/api/chat/history');
+      if (res.ok) {
+        const data = await res.json();
+        set({ history: data.history || [] });
+      }
+    } catch (e) {
+      console.error('VELRYA AI loadHistory error', e);
+    }
   },
 
   deleteChat: async (id: string) => {
-    await fetch(`/api/chat/${id}`, { method: 'DELETE' });
-    set(state => ({ history: state.history.filter(h => h.id !== id) }));
+    try {
+      await fetch(`/api/chat/${id}`, { method: 'DELETE' });
+      set((state) => ({
+        history: state.history.filter((h) => h.id !== id),
+      }));
+    } catch (e) {
+      console.error('VELRYA AI delete error', e);
+    }
   },
 
   clearMessages: () => set({ messages: [] }),
