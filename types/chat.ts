@@ -1,8 +1,9 @@
 export interface Message {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
   provider?: string;
+  model?: string;
   files?: string[];
 }
 
@@ -11,6 +12,7 @@ export interface ChatHistoryItem {
   title: string;
   updatedAt: string;
   preview?: string;
+  providerUsed?: string;
 }
 
 export interface ChatState {
@@ -18,3 +20,15 @@ export interface ChatState {
   isLoading: boolean;
   error: string | null;
 }
+
+export interface VELRYAConfig {
+  appName: 'VELRYA AI';
+  version: '1.0.0';
+  theme: 'dark-premium-3d';
+}
+
+export type AppUser = {
+  id: string;
+  email: string;
+  role: 'user'; // only user - no super_admin
+};
