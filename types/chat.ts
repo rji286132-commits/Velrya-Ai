@@ -21,14 +21,8 @@ export interface ChatState {
   error: string | null;
 }
 
-export interface VELRYAConfig {
-  appName: 'VELRYA AI';
-  version: '1.0.0';
-  theme: 'dark-premium-3d';
-}
-
 export type AppUser = {
   id: string;
   email: string;
-  role: 'user'; // only user - no super_admin
+  role: 'user';
 };
