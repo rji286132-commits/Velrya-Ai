@@ -29,22 +29,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08080f] flex items-center justify-center p-4">
-      <div className="w-full max-w-[400px] bg-[#12121f] rounded-2xl p-8 border border-white/10">
-        <h1 className="text-3xl font-bold text-center text-white tracking-wider">VELRYA AI</h1>
-        <p className="text-center mt-2 mb-6 text-gray-400">Login</p>
+    <div className="min-h-screen bg-[#070711] flex items-center justify-center p-4">
+      <div className="w-full max-w-[420px] bg-[#13132b]/90 backdrop-blur rounded-[28px] p-8 border border-white/10">
+        <h1 className="text-[34px] font-extrabold text-center text-white tracking-wide">VELRYA AI</h1>
+        <p className="text-center mt-1 mb-8 text-[#9a9ac0] text-[15px]">Login</p>
 
-        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full p-3.5 mb-4 rounded-xl bg-[#E8F0FE] text-black outline-none" />
+        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" className="w-full h-[56px] px-5 mb-4 rounded-2xl bg-[#1f1f45]/80 border border-[#2a2a60] text-white placeholder:text-[#6b6b9a] outline-none focus:border-violet-500" />
 
-        <div className="relative mb-5">
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type={show? "text" : "password"} placeholder="Password" className="w-full p-3.5 pr-20 rounded-xl bg-[#E8F0FE] text-black outline-none" />
-          <button onClick={() => setShow(!show)} className="absolute right-2 top-2 bottom-2 px-4 bg-[#2a3a8c] rounded-lg text-sm font-bold text-white">{show? "HIDE" : "SHOW"}</button>
+        <div className="relative mb-7">
+          <input value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} placeholder="Password" className="w-full h-[56px] px-5 pr-24 rounded-2xl bg-[#1f1f45]/80 border border-[#2a2a60] text-white placeholder:text-[#6b6b9a] outline-none focus:border-violet-500" />
+          <button onClick={()=>setShow(!show)} className="absolute right-2 top-2 bottom-2 px-5 bg-[#2e2e7a] rounded-xl text-[13px] font-bold text-white">{show?"HIDE":"SHOW"}</button>
         </div>
 
-        <button onClick={handleLogin} className="w-full p-3.5 rounded-full bg-white text-black font-bold mb-3">Login</button>
-        <button onClick={handleGoogle} className="w-full p-3.5 rounded-full bg-[#2a2a5a] text-white">Continue with Google</button>
+        <button onClick={handleLogin} className="w-full h-[52px] rounded-full bg-white text-black font-bold text-[15px]">Login</button>
+        <button onClick={handleGoogle} className="w-full h-[52px] rounded-full bg-[#2a2a5a] text-white mt-3">Continue with Google</button>
 
-        <div className="text-center text-gray-400 text-sm mt-4">No account? <Link href="/register" className="text-white font-bold">Register</Link></div>
+        <p className="text-center text-sm text-[#7a7aa0] mt-6">No account? <Link href="/register" className="text-white font-semibold underline">Register</Link></p>
       </div>
     </div>
   );
