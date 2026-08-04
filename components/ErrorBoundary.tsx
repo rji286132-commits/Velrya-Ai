@@ -25,8 +25,8 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <div className="min-h- w-full flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-[#12121f]/80 backdrop-blur-xl border border-red-500/20 rounded- p-6 text-center shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+        <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#08080f]">
+          <div className="w-full max-w-md bg-[#12121f]/80 backdrop-blur-xl border border-red-500/20 rounded-2xl p-6 text-center shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
             <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-3">
               <span className="text-xl">⚠️</span>
             </div>
