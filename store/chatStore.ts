@@ -1,29 +1,46 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import type { Message, ChatSession } from '@/types';
 
 interface ChatStore {
-  recentChats: string[];
-  activeChatId: string | null;
-  addRecentChat: (id: string) => void;
-  setActiveChat: (id: string | null) => void;
-  clearRecent: () => void;
+  messages: Message[];
+  currentSession: ChatSession | null;
+  loading: boolean;
+  error: string | null;
+  addMessage: (message: Message) => void;
+  setMessages: (messages: Message[]) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  setCurrentSession: (session: ChatSession | null) => void;
+  clearChat: () => void;
 }
 
-export const useChatStore = create<ChatStore>()(
-  persist(
-    (set) => ({
-      recentChats: [],
-      activeChatId: null,
-      addRecentChat: (id) =>
-        set((state) => ({
-          recentChats: [id, ...state.recentChats.filter((c) => c !== id)].slice(0, 20),
-        })),
-      setActiveChat: (id) => set({ activeChatId: id }),
-      clearRecent: () => set({ recentChats: [], activeChatId: null }),
+export const useChatStore = create<ChatStore>((set) => ({
+  messages: [],
+  currentSession: null,
+  loading: false,
+  error: null,
+
+  addMessage: (message: Message) =>
+    set((state) => ({
+      messages: [...state.messages, message],
+    })),
+
+  setMessages: (messages: Message[]) =>
+    set({ messages }),
+
+  setLoading: (loading: boolean) =>
+    set({ loading }),
+
+  setError: (error: string | null) =>
+    set({ error }),
+
+  setCurrentSession: (session: ChatSession | null) =>
+    set({ currentSession: session }),
+
+  clearChat: () =>
+    set({
+      messages: [],
+      currentSession: null,
+      error: null,
     }),
-    { 
-      name: 'velrya-chat-storage',
-      version: 1,
-    }
-  )
-);
+}));

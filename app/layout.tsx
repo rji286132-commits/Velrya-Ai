@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://velrya-ai.vercel.app"),
+  metadataBase: new URL("https://velrya-ai-phi.vercel.app"),
   title: "VELRYA AI - Intelligent Chat Assistant",
   description: "Build and chat with VELRYA AI - Your intelligent assistant for coding, writing, and ideas.",
   keywords: "AI chat, assistant, coding, writing, velrya",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "VELRYA AI - Intelligent Chat Assistant",
     description: "Build and chat with VELRYA AI - Your intelligent assistant.",
-    url: "https://velrya-ai.vercel.app",
+    url: "https://velrya-ai-phi.vercel.app",
     siteName: "VELRYA AI",
     images: [
       {
@@ -60,7 +60,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="min-h- w-screen bg-[#08080f] antialiased overflow-x-hidden">
+      <body className="min-h-screen w-screen bg-[#08080f] antialiased overflow-x-hidden">
         {children}
       </body>
     </html>

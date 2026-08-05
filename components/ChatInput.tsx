@@ -1,67 +1,63 @@
 'use client';
-import { useState, useRef, KeyboardEvent } from 'react';
-import { Send, Paperclip, X } from 'lucide-react';
+
+import { useState, useRef, useEffect } from 'react';
+import { Send } from 'lucide-react';
 
 interface ChatInputProps {
-  onSend: (content: string, file?: File) => void;
-  isLoading: boolean;
+  onSend: (message: string) => void;
+  disabled?: boolean;
 }
 
-export function ChatInput({ onSend, isLoading }: ChatInputProps) {
-  const [content, setContent] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export default function ChatInput({ onSend, disabled = false }: ChatInputProps) {
+  const [input, setInput] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(
+        textareaRef.current.scrollHeight,
+        120
+      ).toString() + 'px';
+    }
+  }, [input]);
 
   const handleSend = () => {
-    if (!content.trim() &&!file) return;
-    onSend(content, file || undefined);
-    setContent('');
-    setFile(null);
+    if (input.trim() && !disabled) {
+      onSend(input);
+      setInput('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
+    }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' &&!e.shiftKey) {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-2">
-      {file && (
-        <div className="flex items-center gap-2 bg-[#1c1c2e]/80 backdrop-blur px-3 py-2 rounded-xl border border-white/10">
-          <span className="text-white text-sm truncate flex-1">{file.name}</span>
-          <button onClick={() => setFile(null)} className="text-gray-400 hover:text-red-400 p-1 hover:bg-white/10 rounded-full">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-      <div className="flex items-end gap-2 bg-[#12121f]/80 backdrop-blur-xl rounded-2xl border border-white/10 p-2 md:p-2.5 focus-within:border-white/20 transition-all">
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 md:p-3 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition shrink-0"
-        >
-          <Paperclip className="h-5 w-5" />
-        </button>
-        <input ref={fileInputRef} type="file" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Describe your website with VELRYA AI..."
-          className="flex-1 bg-transparent text-white outline-none resize-none min-h-[48px] max-h-[120px] py-3 text-[15px] placeholder:text-gray-500 leading-6"
-          rows={1}
-          disabled={isLoading}
-        />
-        <button
-          onClick={handleSend}
-          disabled={(!content.trim() &&!file) || isLoading}
-          className="p-2.5 md:p-3 bg-white hover:bg-gray-200 rounded-full text-black disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.95] transition-all shrink-0"
-        >
-          <Send className="h-5 w-5" />
-        </button>
-      </div>
-      <p className="text-[11px] text-gray-500 text-center px-4 hidden md:block">Press Enter to send, Shift + Enter for new line</p>
+    <div className="flex gap-3 items-end">
+      <textarea
+        ref={textareaRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyPress={handleKeyPress}
+        placeholder="Type your message... (Shift + Enter for new line)"
+        disabled={disabled}
+        rows={1}
+        className="flex-1 px-4 py-3 rounded-xl bg-[#1e1e2e] text-white border border-gray-700 focus:border-purple-500 focus:outline-none resize-none placeholder-gray-500 disabled:opacity-50"
+      />
+      <button
+        onClick={handleSend}
+        disabled={!input.trim() || disabled}
+        className="px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
+      >
+        <Send size={20} />
+      </button>
     </div>
   );
 }

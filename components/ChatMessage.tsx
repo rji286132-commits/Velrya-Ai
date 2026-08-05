@@ -1,34 +1,38 @@
 'use client';
-import { User, Bot } from 'lucide-react';
+
+import { memo } from 'react';
+import type { Message } from '@/types';
 
 interface ChatMessageProps {
-  message: any;
+  message: Message;
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
-  const isUser = message?.role === 'user';
+const ChatMessage = memo(function ChatMessage({ message }: ChatMessageProps) {
+  const isUser = message.role === 'user';
 
   return (
-    <div className={`flex gap-3 w-full ${isUser ? 'justify-end' : 'justify-start'}`}>
-      {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center shrink-0">
-          <Bot className="h-4 w-4" />
-        </div>
-      )}
-      
-      <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-6 whitespace-pre-wrap break-words border ${
-        isUser 
-          ? 'bg-white text-black border-white' 
-          : 'bg-[#12121f] text-white border-white/10'
-      }`}>
-        {message?.content || ''}
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
+      <div
+        className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
+          isUser
+            ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-br-none'
+            : 'bg-[#1e1e2e] text-gray-100 rounded-bl-none border border-gray-700'
+        }`}
+      >
+        <p className="text-sm leading-relaxed break-words">{message.content}</p>
+        <span
+          className={`text-xs mt-2 block ${
+            isUser ? 'text-purple-200' : 'text-gray-500'
+          }`}
+        >
+          {new Date(message.timestamp).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </span>
       </div>
-
-      {isUser && (
-        <div className="w-8 h-8 rounded-full bg-[#1c1c2e] text-white border border-white/10 flex items-center justify-center shrink-0">
-          <User className="h-4 w-4" />
-        </div>
-      )}
     </div>
   );
-}
+});
+
+export default ChatMessage;
