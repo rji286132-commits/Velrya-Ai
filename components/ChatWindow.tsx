@@ -20,14 +20,14 @@ const ChatWindow = memo(function ChatWindow({
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-white">
+    <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-4 bg-white">
       {messages.length === 0 && !loading && (
         <div className="h-full flex flex-col items-center justify-center text-center">
-          <div className="text-6xl mb-4">✨</div>
-          <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+          <div className="text-6xl md:text-8xl mb-4">✨</div>
+          <h3 className="text-xl md:text-3xl font-bold text-gray-900 mb-2">
             Welcome to VELRYA AI
           </h3>
-          <p className="text-gray-600 max-w-md">
+          <p className="text-sm md:text-base text-gray-600 max-w-md px-4">
             Ask me to build websites, write code, design interfaces, or help with any creative project.
           </p>
         </div>

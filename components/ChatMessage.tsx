@@ -20,18 +20,18 @@ const ChatMessage = memo(function ChatMessage({ message }: ChatMessageProps) {
   };
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 group`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 group px-2 md:px-0`}>
       <div
-        className={`max-w-2xl px-4 py-3 rounded-lg ${
+        className={`max-w-xs md:max-w-2xl px-4 py-3 rounded-2xl text-sm md:text-base ${
           isUser
             ? 'bg-blue-600 text-white rounded-br-none'
             : 'bg-gray-100 text-gray-900 rounded-bl-none border border-gray-200'
         }`}
       >
-        <div className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+        <div className="leading-relaxed break-words whitespace-pre-wrap">
           {message.content}
         </div>
-        <div className={`text-xs mt-2 flex items-center justify-between ${
+        <div className={`text-xs mt-2 flex items-center justify-between gap-2 ${
           isUser ? 'text-blue-100' : 'text-gray-500'
         }`}>
           <span>
@@ -48,7 +48,7 @@ const ChatMessage = memo(function ChatMessage({ message }: ChatMessageProps) {
           {!isUser && (
             <button
               onClick={handleCopy}
-              className="opacity-0 group-hover:opacity-100 transition ml-2 hover:text-gray-700"
+              className="opacity-0 group-hover:opacity-100 transition hover:text-gray-700"
               title="Copy message"
             >
               {copied ? <Check size={14} /> : <Copy size={14} />}

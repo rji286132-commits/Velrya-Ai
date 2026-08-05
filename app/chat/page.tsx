@@ -2,15 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import ChatNavbar from '@/components/ChatNavbar';
 import ChatWindow from '@/components/ChatWindow';
 import ChatInput from '@/components/ChatInput';
-import Sidebar from '@/components/Sidebar';
-import FileMenu from '@/components/FileMenu';
 import { useChatStore } from '@/store/chatStore';
 import { getCurrentUser, logout } from '@/lib/auth-utils';
 import type { User, Message, Conversation } from '@/types';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Menu, LogOut, Settings } from 'lucide-react';
 
 export default function ChatPage() {
   const router = useRouter();
@@ -18,10 +15,9 @@ export default function ChatPage() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [fileMenuOpen, setFileMenuOpen] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const { messages, loading, addMessage, setMessages, setLoading, setError: setChatError } = useChatStore();
 
@@ -117,18 +113,6 @@ export default function ChatPage() {
     }
   };
 
-  const handleDeleteConversation = async (conversationId: string) => {
-    try {
-      await fetch(`/api/conversations/${conversationId}`, { method: 'DELETE' });
-      setConversations(conversations.filter(c => c.id !== conversationId));
-      if (currentConversationId === conversationId) {
-        handleNewChat();
-      }
-    } catch (err) {
-      console.error('Failed to delete conversation:', err);
-    }
-  };
-
   const handleSendMessage = useCallback(
     async (content: string) => {
       if (!user || !content.trim()) return;
@@ -209,7 +193,7 @@ export default function ChatPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center">
+      <div className="h-[100dvh] w-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
           <p className="text-lg">Loading chat...</p>
@@ -221,60 +205,91 @@ export default function ChatPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <ChatNavbar user={user} onLogout={handleLogout} onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="h-[100dvh] w-screen bg-white flex flex-col relative">
+      {/* Header */}
+      <header className="w-full h-16 shrink-0 border-b border-gray-200 flex items-center justify-between px-4 md:px-6 bg-white">
+        <button className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-700">
+          <Menu size={20} />
+        </button>
 
-      <div className="flex-1 flex overflow-hidden">
-        <div className={`fixed md:relative w-64 h-full bg-gray-50 border-r border-gray-200 z-30 transition-transform ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}>
-          <Sidebar
-            conversations={conversations}
-            currentConversationId={currentConversationId ?? undefined}
-            onNewChat={handleNewChat}
-            onSelectConversation={(id) => {
-              setCurrentConversationId(id);
-              router.push(`/chat?conversation=${id}`);
-              setSidebarOpen(false);
-            }}
-            onDeleteConversation={handleDeleteConversation}
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-          />
+        <div className="flex-1 text-center">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+            ✨ VELRYA
+          </h1>
         </div>
 
-        <div className="flex-1 flex flex-col w-full">
-          {error && (
-            <div className="mx-4 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3 items-start">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm text-red-700">{error}</p>
+        {/* Profile Avatar */}
+        <div className="relative">
+          <button
+            onClick={() => setProfileOpen(!profileOpen)}
+            className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center hover:bg-blue-700 transition text-sm"
+          >
+            {user.email?.[0].toUpperCase() || 'U'}
+          </button>
+
+          {profileOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+              <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200 truncate">
+                {user.email}
               </div>
               <button
-                onClick={() => setError(null)}
-                className="text-red-600 hover:text-red-700 text-sm font-medium"
+                onClick={() => {
+                  setProfileOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-gray-700 text-sm"
               >
-                Dismiss
+                <Settings size={16} />
+                Settings
+              </button>
+              <button
+                onClick={() => {
+                  setProfileOpen(false);
+                  handleLogout();
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-red-50 flex items-center gap-2 text-red-600 text-sm"
+              >
+                <LogOut size={16} />
+                Logout
               </button>
             </div>
           )}
+        </div>
+      </header>
 
-          <ChatWindow messages={messages} loading={loading} />
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Error Alert */}
+        {error && (
+          <div className="mx-4 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3 items-start">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-600 hover:text-red-700 text-sm font-medium"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
-          <div className="border-t border-gray-200 px-4 py-4 bg-white">
+        {/* Chat Messages */}
+        <ChatWindow messages={messages} loading={loading} />
+
+        {/* Input Area */}
+        <div className="w-full p-4 bg-white border-t border-gray-200">
+          <div className="w-[95%] max-w-3xl mx-auto">
             <ChatInput
               onSend={handleSendMessage}
-              onMenuClick={() => setFileMenuOpen(!fileMenuOpen)}
               disabled={loading}
             />
             <p className="text-xs text-gray-500 mt-2 text-center">
-              VELRYA AI v1.0 • Powered by Next.js & Supabase • Llama 3.3 70B
+              VELRYA AI v1.0 • Llama 3.3 70B • Powered by Next.js & Supabase
             </p>
           </div>
         </div>
       </div>
-
-      <FileMenu isOpen={fileMenuOpen} onClose={() => setFileMenuOpen(false)} />
     </div>
   );
 }
