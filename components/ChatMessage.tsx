@@ -1,63 +1,16 @@
 'use client';
-
-import { memo } from 'react';
-import { Copy, Check } from 'lucide-react';
-import { useState } from 'react';
 import type { Message } from '@/types';
 
-interface ChatMessageProps {
-  message: Message;
-}
-
-const ChatMessage = memo(function ChatMessage({ message }: ChatMessageProps) {
+export default function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === 'user';
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(message.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 group px-2 md:px-0`}>
-      <div
-        className={`max-w-xs md:max-w-2xl px-4 py-3 rounded-2xl text-sm md:text-base ${
-          isUser
-            ? 'bg-blue-600 text-white rounded-br-none'
-            : 'bg-gray-100 text-gray-900 rounded-bl-none border border-gray-200'
-        }`}
-      >
-        <div className="leading-relaxed break-words whitespace-pre-wrap">
-          {message.content}
+    <div className={`w-full px-4 py-5 border-b border-black/[0.06] ${isUser? 'bg-white' : 'bg-[#f7f7f8]'}`}>
+      <div className="max-w-3xl mx-auto flex gap-3">
+        <div className={`w-7 h-7 rounded-full grid place-items-center text-[11px] font-bold shrink-0 ${isUser? 'bg-zinc-200 text-zinc-700' : 'bg-black text-white'}`}>
+          {isUser? 'U' : 'V'}
         </div>
-        <div className={`text-xs mt-2 flex items-center justify-between gap-2 ${
-          isUser ? 'text-blue-100' : 'text-gray-500'
-        }`}>
-          <span>
-            {message.created_at
-              ? new Date(message.created_at).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              : new Date(message.timestamp).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-          </span>
-          {!isUser && (
-            <button
-              onClick={handleCopy}
-              className="opacity-0 group-hover:opacity-100 transition hover:text-gray-700"
-              title="Copy message"
-            >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-            </button>
-          )}
-        </div>
+        <div className="flex-1 min-w-0 whitespace-pre-wrap break-words text-[14.5px] leading-7 text-zinc-800">{message.content}</div>
       </div>
     </div>
   );
-});
-
-export default ChatMessage;
+}
