@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useChat } from '@/hooks/useChat';
 import { Eye, Code, Download, Copy, Check } from 'lucide-react';
 
-export function Preview({ chatId }: { chatId: string | null }) {
+export function Preview({ chatId = null }: { chatId?: string | null }) {
   const chatData: any = useChat();
   const messages = chatData?.messages || [];
   const [view, setView] = useState<'preview' | 'code'>('preview');
@@ -93,31 +93,26 @@ export function Preview({ chatId }: { chatId: string | null }) {
             {html && (
               <div className="bg-[#12121f]/80 border border-white/10 rounded-xl overflow-hidden">
                 <div className="text-[11px] font-bold text-gray-400 px-3 py-2 border-b border-white/10">HTML • VELRYA AI</div>
-                <pre className="p-3 text-xs text-gray-300 overflow-auto max-h-[400px]">
-                  <code>{html}</code>
-                </pre>
+                <pre className="p-3 text-xs text-gray-300 overflow-auto max-h-[400px]"><code>{html}</code></pre>
               </div>
             )}
             {css && (
               <div className="bg-[#12121f]/80 border border-white/10 rounded-xl overflow-hidden">
                 <div className="text-[11px] font-bold text-gray-400 px-3 py-2 border-b border-white/10">CSS</div>
-                <pre className="p-3 text-xs text-gray-300 overflow-auto max-h-[400px]">
-                  <code>{css}</code>
-                </pre>
+                <pre className="p-3 text-xs text-gray-300 overflow-auto max-h-[400px]"><code>{css}</code></pre>
               </div>
             )}
             {js && (
               <div className="bg-[#12121f]/80 border border-white/10 rounded-xl overflow-hidden">
                 <div className="text-[11px] font-bold text-gray-400 px-3 py-2 border-b border-white/10">JavaScript</div>
-                <pre className="p-3 text-xs text-gray-300 overflow-auto max-h-[400px]">
-                  <code>{js}</code>
-                </pre>
+                <pre className="p-3 text-xs text-gray-300 overflow-auto max-h-[400px]"><code>{js}</code></pre>
               </div>
             )}
-            {!html &&!css &&!js && <div className="h-full flex items-center justify-center text-gray-500 text-sm p-10">No code generated</div>}
           </div>
         )}
       </div>
     </div>
   );
 }
+
+export default Preview;
