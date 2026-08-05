@@ -1,67 +1,26 @@
 'use client';
-
-import { useEffect, useRef, memo } from 'react';
-import type { Message } from '@/types';
+import { useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
+import type { Message } from '@/types';
 
-interface ChatWindowProps {
-  messages: Message[];
-  loading?: boolean;
-  isLoading?: boolean; // <-- ye add kiya taaki dono naam chal jaye
-}
-
-const ChatWindow = memo(function ChatWindow({
-  messages,
-  loading = false,
-  isLoading = false,
-}: ChatWindowProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const showLoading = loading || isLoading;
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, showLoading]);
+export default function ChatWindow({ messages, loading }: { messages: Message[]; loading?: boolean }) {
+  const endRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-4 bg-white">
-      {messages.length === 0 && !showLoading && (
-        <div className="h-full flex flex-col items-center justify-center text-center">
-          <div className="text-6xl md:text-8xl mb-4">✨</div>
-          <h3 className="text-xl md:text-3xl font-bold text-gray-900 mb-2">
-            Welcome to VELRYA AI
-          </h3>
-          <p className="text-sm md:text-base text-gray-600 max-w-md px-4">
-            Ask me to build websites, write code, design interfaces, or help with any creative project.
-          </p>
+    <div className="flex-1 overflow-y-auto bg-white">
+      {messages.length === 0 &&!loading && (
+        <div className="h-full flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-black text-white grid place-items-center text-xl mb-4">✦</div>
+          <h2 className="text-xl font-semibold mb-1">How can I help you today?</h2>
+          <p className="text-sm text-zinc-500">Build websites, write code, create anything with VELRYA</p>
         </div>
       )}
-
-      {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
-      ))}
-
-      {showLoading && (
-        <div className="flex justify-start mb-4">
-          <div className="bg-gray-100 text-gray-900 px-4 py-3 rounded-lg rounded-bl-none border border-gray-200">
-            <div className="flex gap-2">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-              <div
-                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                style={{ animationDelay: '0.1s' }}
-              />
-              <div
-                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                style={{ animationDelay: '0.2s' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div ref={messagesEndRef} />
+      <div className="w-full max-w-3xl mx-auto">
+        {messages.map((m) => <ChatMessage key={m.id} message={m} />)}
+        {loading && <div className="px-6 py-6 text-sm text-zinc-500 animate-pulse">VELRYA is thinking...</div>}
+        <div ref={endRef} />
+      </div>
     </div>
   );
-});
-
-export default ChatWindow;
-export { ChatWindow };
+}
