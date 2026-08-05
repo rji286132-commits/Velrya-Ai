@@ -32,14 +32,8 @@ export interface ChatSession {
   updated_at: number;
 }
 
-export interface AuthState {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-}
-
-export interface ChatState {
-  messages: Message[];
-  loading: boolean;
-  error: string | null;
+export interface ChatInputProps {
+  onSend: (message: string) => void;
+  disabled?: boolean;
+  onTogglePreview?: () => void;
 }
