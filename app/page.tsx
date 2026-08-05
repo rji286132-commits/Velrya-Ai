@@ -41,7 +41,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-screen bg-[#08080f] text-white flex flex-col relative overflow-hidden">
-      {/* Animated Background Gradients */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -81,13 +80,12 @@ export default function Home() {
             )}
           </div>
 
-          {/* Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto w-full px-4 md:px-6">
             <div className="bg-[#12121f]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-center hover:border-purple-500/30 transition">
               <div className="text-4xl mb-3">⚡</div>
               <h3 className="font-bold text-lg mb-2">Lightning Fast</h3>
               <p className="text-sm text-gray-400">
-                Get instant responses with our optimized AI engine
+                Get instant responses with our optimized AI engine powered by Llama 3.3 70B
               </p>
             </div>
 
@@ -95,7 +93,7 @@ export default function Home() {
               <div className="text-4xl mb-3">🔒</div>
               <h3 className="font-bold text-lg mb-2">Secure Auth</h3>
               <p className="text-sm text-gray-400">
-                Your data is protected with enterprise-grade security
+                Your data is protected with enterprise-grade security via Supabase
               </p>
             </div>
 
@@ -103,12 +101,11 @@ export default function Home() {
               <div className="text-4xl mb-3">🚀</div>
               <h3 className="font-bold text-lg mb-2">Deploy Ready</h3>
               <p className="text-sm text-gray-400">
-                Export and deploy your ideas anywhere instantly
+                Export and deploy your ideas anywhere instantly with one click
               </p>
             </div>
           </div>
 
-          {/* Additional Features */}
           <div className="mt-16 space-y-4 max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">Powerful Features</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
