@@ -10,8 +10,8 @@ export interface Message {
   content: string;
   role: 'user' | 'assistant';
   timestamp: number;
-  user_id?: string;
-  conversation_id?: string;
+  user_id: string;
+  conversation_id: string;
   created_at?: string;
 }
 

@@ -74,7 +74,7 @@ export default function ChatPage() {
         const formattedMessages = data.messages.map((msg: any) => ({
           id: msg.id,
           content: msg.content,
-          role: msg.role,
+          role: msg.role as 'user' | 'assistant',
           timestamp: new Date(msg.created_at).getTime(),
           user_id: msg.user_id,
           conversation_id: msg.conversation_id,
@@ -87,24 +87,33 @@ export default function ChatPage() {
     }
   };
 
+  const createNewConversation = async (title: string): Promise<string> => {
+    const response = await fetch('/api/conversations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create conversation');
+    }
+
+    const data = await response.json();
+    return data.conversation.id as string;
+  };
+
   const handleNewChat = async () => {
     try {
-      const response = await fetch('/api/conversations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: 'New Conversation' }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentConversationId(data.conversation.id);
-        setMessages([]);
-        setError(null);
-        router.push(`/chat?conversation=${data.conversation.id}`);
-        await loadConversations(user!.id);
-      }
+      if (!user) return;
+      const convId = await createNewConversation('New Conversation');
+      setCurrentConversationId(convId);
+      setMessages([]);
+      setError(null);
+      router.push(`/chat?conversation=${convId}`);
+      await loadConversations(user.id);
     } catch (err) {
       console.error('Failed to create conversation:', err);
+      setError('Failed to create new conversation');
     }
   };
 
@@ -124,36 +133,32 @@ export default function ChatPage() {
     async (content: string) => {
       if (!user || !content.trim()) return;
 
-      let convId = currentConversationId;
-      if (!convId) {
-        const response = await fetch('/api/conversations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: content.substring(0, 50) }),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          convId = data.conversation.id;
+      try {
+        let convId = currentConversationId;
+
+        // Create conversation if needed
+        if (!convId) {
+          convId = await createNewConversation(content.substring(0, 50));
           setCurrentConversationId(convId);
           router.push(`/chat?conversation=${convId}`);
           await loadConversations(user.id);
         }
-      }
 
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        content,
-        role: 'user',
-        timestamp: Date.now(),
-        user_id: user.id,
-        conversation_id: convId,
-      };
+        // Add user message
+        const userMessage: Message = {
+          id: Date.now().toString(),
+          content,
+          role: 'user',
+          timestamp: Date.now(),
+          user_id: user.id,
+          conversation_id: convId,
+        };
 
-      addMessage(userMessage);
-      setLoading(true);
-      setChatError(null);
+        addMessage(userMessage);
+        setLoading(true);
+        setChatError(null);
 
-      try {
+        // Call AI API
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -176,6 +181,7 @@ export default function ChatPage() {
           content: data.response,
           role: 'assistant',
           timestamp: Date.now(),
+          user_id: user.id,
           conversation_id: convId,
         };
 
@@ -188,7 +194,7 @@ export default function ChatPage() {
         setLoading(false);
       }
     },
-    [user, currentConversationId, addMessage, setLoading, setChatError, router]
+    [user, currentConversationId, addMessage, setLoading, setChatError, router, conversations]
   );
 
   const handleLogout = async () => {
@@ -224,7 +230,7 @@ export default function ChatPage() {
         }`}>
           <Sidebar
             conversations={conversations}
-            currentConversationId={currentConversationId || undefined}
+            currentConversationId={currentConversationId ?? undefined}
             onNewChat={handleNewChat}
             onSelectConversation={(id) => {
               setCurrentConversationId(id);
