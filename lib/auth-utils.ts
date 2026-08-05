@@ -8,22 +8,14 @@ export async function getCurrentUser(): Promise<User | null> {
       error,
     } = await supabase.auth.getUser();
 
-    if (error || !user) {
-      const stored = localStorage.getItem('velrya_user');
-      if (stored) {
-        return JSON.parse(stored);
-      }
-      return null;
-    }
+    if (error ||!user) return null;
 
     const currentUser: User = {
       id: user.id,
       email: user.email || '',
-      name: user.user_metadata?.name,
+      name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
       created_at: user.created_at,
     };
-
-    localStorage.setItem('velrya_user', JSON.stringify(currentUser));
     return currentUser;
   } catch (error) {
     console.error('Error getting current user:', error);
@@ -34,9 +26,16 @@ export async function getCurrentUser(): Promise<User | null> {
 export async function logout(): Promise<void> {
   try {
     await supabase.auth.signOut();
-    localStorage.removeItem('velrya_user');
-    localStorage.removeItem('user');
+    if (typeof window!== 'undefined') {
+      localStorage.removeItem('velrya_user');
+      localStorage.removeItem('user');
+    }
   } catch (error) {
     console.error('Error logging out:', error);
   }
+}
+
+export function getInitialLetter(nameOrEmail: string): string {
+  if (!nameOrEmail) return 'U';
+  return nameOrEmail.trim().charAt(0).toUpperCase();
 }
