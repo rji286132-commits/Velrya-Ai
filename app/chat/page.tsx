@@ -1,37 +1,46 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
 
-export default function Chat() {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
 
-  useEffect(() => {
-    const u = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!u.email) {
-      router.push('/login');
-    } else {
-      setUser(u);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert('Email and password required');
+      return;
     }
-  }, [router]);
+    const { data, error } = await supabase.from('users').select('*').eq('email', email).eq('password', password).single();
+    
+    if (error || !data) {
+      alert('Invalid email or password');
+      return;
+    }
 
-  const logout = () => {
-    localStorage.removeItem('user');
-    router.push('/login');
+    localStorage.setItem('user', JSON.stringify(data));
+    
+    if (data.role === 'super_admin') {
+      router.push('/admin');
+    } else {
+      router.push('/chat');
+    }
   };
 
-  if (!user) return <div className="min-h-screen bg-[#08080f] text-white p-8">Loading...</div>;
-
   return (
-    <div className="min-h-screen bg-[#08080f] text-white p-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Velrya AI - Chat</h1>
-        <button onClick={logout} className="bg-white text-black px-4 py-2 rounded">Logout</button>
-      </div>
-      <p className="mt-4 text-gray-400">Welcome {user.email} - Chat is working now!</p>
-
-      <div className="mt-8 border border-gray-700 rounded p-4">
-        <p>Yahan tumhara AI chat ka code ayega</p>
+    <div className="min-h-screen bg-[#08080f] flex items-center justify-center p-4">
+      <div className="bg-[#12121a] p-8 rounded-2xl w-full max-w-sm">
+        <h1 className="text-3xl font-bold text-white text-center mb-6">VELRYA AI</h1>
+        <input value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Email" className="w-full p-3 rounded bg-black text-white mb-3" />
+        <input value={password} onChange={(e)=>setPassword(e.target.value)} type="password" placeholder="Password" className="w-full p-3 rounded bg-black text-white mb-4" />
+        <button onClick={handleLogin} className="w-full bg-white text-black p-3 rounded font-bold">Login</button>
       </div>
     </div>
   );
