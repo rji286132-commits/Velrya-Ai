@@ -1,85 +1,50 @@
 'use client';
-
-import { useState } from 'react';
-import Link from 'next/link';
-import { ChevronDown, Trash2, Plus } from 'lucide-react';
+import { X, Plus, MessageSquare, Trash2 } from 'lucide-react';
 import type { Conversation } from '@/types';
 
-interface SidebarProps {
+interface Props {
   conversations: Conversation[];
   currentConversationId?: string;
   onNewChat: () => void;
   onSelectConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
-  isOpen?: boolean;
-  onClose?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export default function Sidebar({
-  conversations,
-  currentConversationId,
-  onNewChat,
-  onSelectConversation,
-  onDeleteConversation,
-  isOpen = true,
-  onClose,
-}: SidebarProps) {
+export default function Sidebar({ conversations, currentConversationId, onNewChat, onSelectConversation, onDeleteConversation, isOpen, onClose }: Props) {
   return (
-    <div
-      className={`h-full w-64 bg-gray-50 border-r border-gray-200 flex flex-col ${
-        isOpen ? 'block' : 'hidden'
-      } md:block`}
-    >
-      <div className="p-4 border-b border-gray-200">
-        <button
-          onClick={onNewChat}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition font-medium"
-        >
-          <Plus size={18} />
-          <span>New Chat</span>
-        </button>
-      </div>
+    <>
+      {isOpen && <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-40" onClick={onClose} />}
+      <div className={`fixed top-0 left-0 h-full w-[280px] bg-[#171717] text-white z-50 flex flex-col transition-transform duration-300 ${isOpen? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-[56px] px-3 flex items-center justify-between border-b border-white/10">
+          <button onClick={onNewChat} className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-white/10 hover:bg-white/15 rounded-lg text-sm font-medium">
+            <Plus size={16} /> New Chat
+          </button>
+          <button onClick={onClose} className="ml-2 p-2 hover:bg-white/10 rounded-lg"><X size={18} /></button>
+        </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
-        {conversations.length === 0 ? (
-          <div className="text-center text-sm text-gray-500 py-8">
-            <p>No conversations yet</p>
-          </div>
-        ) : (
-          conversations.map((conv) => (
-            <div key={conv.id}>
-              <button
-                onClick={() => onSelectConversation(conv.id)}
-                className={`w-full text-left px-3 py-2 rounded-lg transition ${
-                  currentConversationId === conv.id
-                    ? 'bg-gray-200 font-semibold'
-                    : 'hover:bg-gray-100'
-                }}`}
-              >
-                <div className="truncate text-sm flex items-center justify-between group">
-                  <span className="truncate">{conv.title}</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteConversation(conv.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 transition p-1 hover:bg-red-100 rounded"
-                  >
-                    <Trash2 size={14} className="text-red-600" />
-                  </button>
-                </div>
-                <div className="text-xs text-gray-500 mt-0.5">
-                  {new Date(conv.created_at).toLocaleDateString()}
-                </div>
-              </button>
-            </div>
-          ))
-        )}
-      </div>
+        <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+          <p className="px-3 py-2 text-[10px] tracking-widest text-white/40 uppercase">History</p>
+          {conversations.length === 0? (
+            <p className="text-center text-white/30 text-sm py-10">No conversations yet</p>
+          ) : (
+            conversations.map((c) => (
+              <div key={c.id} className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer ${currentConversationId === c.id? 'bg-white/10' : ''}`}>
+                <MessageSquare size={14} className="text-white/40 shrink-0" />
+                <button onClick={() => onSelectConversation(c.id)} className="flex-1 truncate text-left text-[13px] text-white/90">
+                  {c.title || 'New Conversation'}
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); onDeleteConversation(c.id); }} className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400">
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
 
-      <div className="p-4 border-t border-gray-200 text-xs text-gray-500 text-center">
-        <p>VELRYA AI v1.0</p>
+        <div className="p-3 border-t border-white/10 text-[10px] text-white/30 text-center">VELRYA AI v1.0 • Llama 3.3 70B</div>
       </div>
-    </div>
+    </>
   );
 }
